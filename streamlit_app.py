@@ -1,6 +1,7 @@
 import streamlit as st
 import google.generativeai as genai
 import json
+import re
 
 # 1. Setup
 try:
@@ -17,8 +18,7 @@ st.set_page_config(page_title="Dev Nimrod | Multi-Lang Auditor", layout="wide")
 st.title("🚀 Dev Nimrod")
 st.markdown("#### *Multi-Language Agentic Code Auditor*")
 
-# --- NEW: Language Selection ---
-col_lang, col_empty = st.columns([1, 2])
+col_lang, _ = st.columns([1, 2])
 with col_lang:
     selected_lang = st.selectbox(
         "Select Programming Language:",
@@ -32,45 +32,53 @@ if st.button("Run Multi-Agent Audit"):
     if not code_input:
         st.warning("Please provide code first!")
     else:
-        with st.spinner(f"Analyzing {selected_lang} logic..."):
-            # The prompt now includes the selected language
+        with st.spinner(f"Agents are auditing {selected_lang}..."):
             prompt = f"""
-            Act as a team of three expert agents specializing in {selected_lang}.
-            Refactor the following {selected_lang} code and return ONLY a JSON object with:
-            "refactored": "code string",
-            "security_audit": "finding",
-            "performance_audit": "finding",
-            "architecture_audit": "finding",
-            "complexity_score": "score"
+            Act as three expert agents (Security, Performance, Architecture).
+            Refactor this {selected_lang} code.
+            Return ONLY a JSON object with these exact keys: 
+            "refactored", "security_audit", "performance_audit", "architecture_audit", "complexity_score".
             
-            CODE: {code_input}
+            CODE:
+            {code_input}
             """
             
             try:
                 response = model.generate_content(prompt)
-                res_text = response.text.replace("```json", "").replace("```", "").strip()
-                data = json.loads(res_text)
+                raw_text = response.text
                 
-                col1, col2 = st.columns([2, 1])
+                # --- ROBUST PARSING LOGIC ---
+                # This finds anything between the first '{' and the last '}'
+                json_match = re.search(r'\{.*\}', raw_text, re.DOTALL)
                 
-                with col1:
-                    st.write(f"### 🛠️ Refactored {selected_lang.upper()}")
-                    # Updated to use the dynamic language variable
-                    st.code(data['refactored'], language=selected_lang)
-                    st.divider()
-                    d_col1, d_col2 = st.columns(2)
-                    with d_col1:
-                        st.caption("Original")
-                        st.code(code_input, language=selected_lang)
-                    with d_col2:
-                        st.caption("Refactored")
+                if json_match:
+                    json_str = json_match.group(0)
+                    data = json.loads(json_str)
+                    
+                    col1, col2 = st.columns([2, 1])
+                    
+                    with col1:
+                        st.write(f"### 🛠️ Refactored {selected_lang.upper()}")
                         st.code(data['refactored'], language=selected_lang)
+                        st.divider()
+                        d_col1, d_col2 = st.columns(2)
+                        with d_col1:
+                            st.caption("Original")
+                            st.code(code_input, language=selected_lang)
+                        with d_col2:
+                            st.caption("Refactored")
+                            st.code(data['refactored'], language=selected_lang)
 
-                with col2:
-                    st.write("### 🧠 Agent Findings")
-                    st.info(f"**Complexity:** {data['complexity_score']}")
-                    with st.expander("🛡️ Security", expanded=True): st.write(data['security_audit'])
-                    with st.expander("⚡ Performance", expanded=True): st.write(data['performance_audit'])
-                    with st.expander("🏗️ Architecture", expanded=True): st.write(data['architecture_audit'])
-            except:
-                st.error("AI parsing error. Try again!")
+                    with col2:
+                        st.write("### 🧠 Agent Findings")
+                        st.info(f"**Complexity:** {data['complexity_score']}")
+                        with st.expander("🛡️ Security", expanded=True): st.write(data['security_audit'])
+                        with st.expander("⚡ Performance", expanded=True): st.write(data['performance_audit'])
+                        with st.expander("🏗️ Architecture", expanded=True): st.write(data['architecture_audit'])
+                else:
+                    st.error("AI did not return valid JSON. Please try again.")
+                    with st.expander("Show Raw Debug Info"):
+                        st.write(raw_text)
+
+            except Exception as e:
+                st.error(f"Error: {str(e)}")
