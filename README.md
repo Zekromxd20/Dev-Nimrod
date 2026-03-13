@@ -2,6 +2,8 @@
 
 **Dev Nimrod** is a state-of-the-art Agentic AI system designed to audit, refactor, and optimize codebases. Built for the 2026 Hackathon, it moves beyond simple chat interfaces by employing a "Multi-Agent" strategy to ensure code is secure, performant, and architecturally sound.
 
+https://dev-nimrod.streamlit.app/
+
 ## 🌟 Key Features
 - **Multi-Agent Orchestration:** Simultaneously triggers three specialized AI agents—Security, Performance, and Architecture—to analyze code from distinct technical perspectives.
 - **Agentic Refactoring:** Automatically rewrites code to improve time complexity (e.g., $O(n^2) \rightarrow O(n)$) and memory safety.
