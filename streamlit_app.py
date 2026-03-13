@@ -13,7 +13,8 @@ else:
     
     # Use the most updated stable model name
     # If 2.0 fails, try 'gemini-1.5-flash' again or 'gemini-2.5-flash'
-    model = genai.GenerativeModel('gemini-2.0-flash')
+    # 'gemini-2.5-flash-lite' has the highest free limits in March 2026
+model = genai.GenerativeModel('gemini-2.5-flash-lite')
 
     code_input = st.text_area("📥 Paste your code here:", height=300)
 
