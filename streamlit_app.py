@@ -3,45 +3,50 @@ import google.generativeai as genai
 import json
 import re
 
-# 1. Setup with corrected Model Name
+# 1. Setup - Updated to the 2026 Stable Model
+MODEL_NAME = 'gemini-2.5-flash' # The current stable workhorse
+
 try:
     if "GOOGLE_API_KEY" in st.secrets:
         genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
-        # 'gemini-1.5-flash-latest' is the most stable endpoint name
-        model = genai.GenerativeModel('gemini-1.5-flash-latest') 
+        model = genai.GenerativeModel(MODEL_NAME) 
     else:
-        st.error("API Key missing in Secrets!")
+        st.error("API Key missing! Go to 'Manage app' > 'Settings' > 'Secrets' and add GOOGLE_API_KEY.")
 except Exception as e:
     st.error(f"Setup Error: {e}")
 
-st.set_page_config(page_title="Dev Nimrod | Multi-Agent Auditor", layout="wide")
+st.set_page_config(page_title="Dev Nimrod | Agentic Auditor", layout="wide")
 
-# Sidebar for Language Selection - Looks more professional
+# Sidebar for Language Selection
 with st.sidebar:
-    st.title("⚙️ Settings")
+    st.title("⚙️ Dev Nimrod Settings")
+    st.markdown("---")
     selected_lang = st.selectbox(
-        "Target Language:",
+        "Programming Language:",
         ["python", "cpp", "java", "javascript", "c", "go", "rust"],
         index=0
     )
     st.divider()
-    st.info("Dev Nimrod uses 3 specialized agents to audit your code.")
+    st.info("🎯 **Strategy:** Multi-Agent specialized auditing (Security, Performance, Architecture).")
 
 st.title("🚀 Dev Nimrod")
-st.markdown(f"#### *Agentic {selected_lang.capitalize()} Auditor*")
+st.markdown(f"#### *Agentic {selected_lang.capitalize()} Auditor & Refactorer*")
 
-code_input = st.text_area(f"Paste your {selected_lang} code here:", height=300)
+# Input Area
+code_input = st.text_area(f"Paste your {selected_lang} code here:", height=300, placeholder="// Your code goes here...")
 
 if st.button("Run Multi-Agent Audit"):
     if not code_input:
         st.warning("Please provide code first!")
     else:
-        with st.spinner(f"Agents are analyzing {selected_lang} logic..."):
-            # Refined prompt for better JSON consistency
+        with st.spinner(f"Agents are analyzing your {selected_lang} logic..."):
+            # Refined prompt for Gemini 2.5/3 agents
             prompt = f"""
-            Refactor this {selected_lang} code.
-            Return ONLY a JSON object. No conversational text. 
-            Keys: "refactored", "security_audit", "performance_audit", "architecture_audit", "complexity_score".
+            Act as three expert agents (Security Specialist, Performance Engineer, Clean Code Architect).
+            Analyze and refactor this {selected_lang} code.
+            
+            Return ONLY a valid JSON object. No other text.
+            Required Keys: "refactored", "security_audit", "performance_audit", "architecture_audit", "complexity_score".
             
             CODE:
             {code_input}
@@ -49,10 +54,9 @@ if st.button("Run Multi-Agent Audit"):
             
             try:
                 response = model.generate_content(prompt)
-                raw_text = response.text
                 
-                # Robust JSON extraction
-                json_match = re.search(r'\{.*\}', raw_text, re.DOTALL)
+                # Robust JSON extraction to avoid 404/parsing errors
+                json_match = re.search(r'\{.*\}', response.text, re.DOTALL)
                 
                 if json_match:
                     data = json.loads(json_match.group(0))
@@ -64,7 +68,7 @@ if st.button("Run Multi-Agent Audit"):
                         st.code(data['refactored'], language=selected_lang)
                         
                         st.divider()
-                        st.subheader("🔍 Comparison")
+                        st.subheader("🔍 Visual Comparison")
                         d_col1, d_col2 = st.columns(2)
                         with d_col1:
                             st.caption("Original")
@@ -75,7 +79,7 @@ if st.button("Run Multi-Agent Audit"):
 
                     with col2:
                         st.subheader("🧠 Agent Findings")
-                        st.success(f"**Complexity:** {data['complexity_score']}")
+                        st.success(f"**Complexity Score:** {data['complexity_score']}")
                         
                         with st.expander("🛡️ Security Specialist", expanded=True):
                             st.write(data['security_audit'])
@@ -86,7 +90,8 @@ if st.button("Run Multi-Agent Audit"):
                         with st.expander("🏗️ Clean Code Architect", expanded=True):
                             st.write(data['architecture_audit'])
                 else:
-                    st.error("AI returned an invalid format. Please try again.")
+                    st.error("AI returned an unexpected format. Please try again.")
 
             except Exception as e:
                 st.error(f"Execution Error: {str(e)}")
+                st.info("Check if your API key has access to 'gemini-2.5-flash' in AI Studio.")
