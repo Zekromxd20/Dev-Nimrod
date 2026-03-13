@@ -20,7 +20,7 @@ Dev Nimrod utilizes a sophisticated **System Prompting** technique to force the 
 
 ## 🗺️ Technical Roadmap: The Future of Dev Nimrod
 
-As a first-year CSE student, my vision for Dev Nimrod extends beyond simple file refactoring. Here is the planned evolution:
+As a first-year CSE student, our vision for Dev Nimrod extends beyond simple file refactoring. Here is the planned evolution:
 
 ### 🟢 Phase 1: Contextual Awareness (Short Term)
 - **Repository-Level Analysis:** Moving from single-file analysis to full-repo context using RAG (Retrieval-Augmented Generation).
