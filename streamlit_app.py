@@ -1,6 +1,5 @@
 import streamlit as st
 import google.generativeai as genai
-import os
 
 # --- PAGE CONFIG ---
 st.set_page_config(page_title="Dev Nimrod", page_icon="🏹", layout="wide")
@@ -8,39 +7,35 @@ st.set_page_config(page_title="Dev Nimrod", page_icon="🏹", layout="wide")
 st.title("🏹 Dev Nimrod: The Mighty Bug Hunter")
 st.markdown("### Agentic AI Bug Detection & Code Refactoring")
 
-# --- API KEY CHECK ---
-# Ensure "GOOGLE_API_KEY" is set in your Streamlit Cloud Secrets
+# --- API KEY & MODEL SETUP ---
 if "GOOGLE_API_KEY" not in st.secrets:
-    st.error("Missing GOOGLE_API_KEY in Streamlit Secrets! Go to Settings > Secrets to add it.")
+    st.error("Missing GOOGLE_API_KEY in Streamlit Secrets! Check your Settings.")
 else:
     genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
     
-    # Using the most stable stable alias for the free tier in 2026
+    # gemini-3-flash is the current 2026 stable model for free usage
     model = genai.GenerativeModel('gemini-3-flash')
 
     # --- UI LAYOUT ---
-    code_input = st.text_area("📥 Paste your code here:", height=300, placeholder="int main() { ... }")
+    code_input = st.text_area("📥 Paste your code here:", height=300, placeholder="#include <stdio.h> ...")
 
     if st.button("🚀 Start the Hunt"):
         if not code_input:
-            st.warning("Nimrod needs some scent! Please paste code first.")
+            st.warning("Please paste some code first!")
         else:
-            with st.spinner("Nimrod is tracking the bugs..."):
+            with st.spinner("Nimrod is tracking the scent..."):
                 try:
-                    # Agentic instructions for the "Hunter" and "Smith"
+                    # Multi-agent style instructions
                     prompt = (
-                        f"You are Dev Nimrod. Analyze this code for bugs and logic flaws.\n"
-                        f"1. Hunter's Report: List the bugs clearly with line references.\n"
-                        f"2. Smith's Fix: Provide the full, corrected code block.\n\n"
-                        f"Code to analyze:\n{code_input}"
+                        f"You are Dev Nimrod. First, act as a 'Bug Hunter' and list the errors in this code. "
+                        f"Second, act as a 'Master Smith' and provide the full corrected code.\n\n"
+                        f"Code:\n{code_input}"
                     )
                     
                     response = model.generate_content(prompt)
-                    
-                    # Display the results
                     st.success("🎯 Hunt Successful!")
                     st.markdown(response.text)
                     
                 except Exception as e:
                     st.error(f"The hunt hit a snag: {e}")
-                    st.info("Tip: If you see a 429 error, wait 60 seconds. The free tier has a rate limit!")
+                    st.info("Tip: If you see a 404, the model name might have updated. Try 'gemini-3-flash-preview'.")
