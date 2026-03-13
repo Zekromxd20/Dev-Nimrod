@@ -2,39 +2,41 @@ import streamlit as st
 import google.generativeai as genai
 import json
 
-# 1. Setup - Using Streamlit Secrets
+# 1. Setup
 try:
     if "GOOGLE_API_KEY" in st.secrets:
         genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
         model = genai.GenerativeModel('gemini-1.5-flash') 
     else:
-        st.error("API Key not found in Secrets!")
+        st.error("API Key missing in Secrets!")
 except Exception as e:
     st.error(f"Setup Error: {e}")
 
-st.set_page_config(page_title="Dev Nimrod | AI Code Auditor", layout="wide")
-
-# Corrected CSS styling line
-st.markdown("""
-    <style>
-    .main { background-color: #0e1117; }
-    .stCodeBlock { border: 1px solid #30363d; }
-    </style>
-    """, unsafe_allow_html=True)
+st.set_page_config(page_title="Dev Nimrod | Multi-Lang Auditor", layout="wide")
 
 st.title("🚀 Dev Nimrod")
-st.markdown("#### *Agentic Multi-Agent Code Auditing & Refactoring*")
+st.markdown("#### *Multi-Language Agentic Code Auditor*")
 
-code_input = st.text_area("Paste your code here:", height=250)
+# --- NEW: Language Selection ---
+col_lang, col_empty = st.columns([1, 2])
+with col_lang:
+    selected_lang = st.selectbox(
+        "Select Programming Language:",
+        ["python", "cpp", "java", "javascript", "c", "go", "rust"],
+        index=0
+    )
+
+code_input = st.text_area(f"Paste your {selected_lang} code here:", height=250)
 
 if st.button("Run Multi-Agent Audit"):
     if not code_input:
         st.warning("Please provide code first!")
     else:
-        with st.spinner("Agents are analyzing..."):
+        with st.spinner(f"Analyzing {selected_lang} logic..."):
+            # The prompt now includes the selected language
             prompt = f"""
-            Act as a team of three expert agents: Security Specialist, Performance Engineer, and Clean Code Architect.
-            Refactor the following code and return ONLY a JSON object with:
+            Act as a team of three expert agents specializing in {selected_lang}.
+            Refactor the following {selected_lang} code and return ONLY a JSON object with:
             "refactored": "code string",
             "security_audit": "finding",
             "performance_audit": "finding",
@@ -52,16 +54,17 @@ if st.button("Run Multi-Agent Audit"):
                 col1, col2 = st.columns([2, 1])
                 
                 with col1:
-                    st.write("### 🛠️ Refactored Output")
-                    st.code(data['refactored'])
+                    st.write(f"### 🛠️ Refactored {selected_lang.upper()}")
+                    # Updated to use the dynamic language variable
+                    st.code(data['refactored'], language=selected_lang)
                     st.divider()
                     d_col1, d_col2 = st.columns(2)
                     with d_col1:
                         st.caption("Original")
-                        st.code(code_input)
+                        st.code(code_input, language=selected_lang)
                     with d_col2:
                         st.caption("Refactored")
-                        st.code(data['refactored'])
+                        st.code(data['refactored'], language=selected_lang)
 
                 with col2:
                     st.write("### 🧠 Agent Findings")
@@ -69,5 +72,5 @@ if st.button("Run Multi-Agent Audit"):
                     with st.expander("🛡️ Security", expanded=True): st.write(data['security_audit'])
                     with st.expander("⚡ Performance", expanded=True): st.write(data['performance_audit'])
                     with st.expander("🏗️ Architecture", expanded=True): st.write(data['architecture_audit'])
-            except Exception as e:
-                st.error("The AI had a hiccup. Please try again!")
+            except:
+                st.error("AI parsing error. Try again!")
