@@ -3,7 +3,7 @@
 **Dev Nimrod** is an autonomous, agentic AI system designed to audit, detect, and refactor code across multiple programming languages. Developed for the **IIT Bombay Hack & Break 2026**, it moves beyond simple chatbots by using a dual-agent reasoning chain to ensure code safety and industrial-grade quality.
 
 ## 🚀 Live Demo
-[Explore Dev Nimrod Live](https://dev-nimrod.streamlit.app) *(Replace with your actual URL)*
+[Explore Dev Nimrod Live](https://dev-nimrod.streamlit.app/)
 
 ---
 
