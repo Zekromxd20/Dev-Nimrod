@@ -1,40 +1,51 @@
 import streamlit as st
 import google.generativeai as genai
 import json
-from streamlit_diff_viewer import diff_viewer
 
-# 1. Setup - Using Streamlit Secrets for the API Key
-# Go to Streamlit Cloud Settings > Secrets to add: GOOGLE_API_KEY = "your_key"
+# 1. Setup - Using Streamlit Secrets
 try:
     genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
-    model = genai.GenerativeModel('gemini-1.5-flash') # Using Flash for speed/hackathons
+    # Using Gemini 1.5 Flash for the fastest hackathon response times
+    model = genai.GenerativeModel('gemini-1.5-flash') 
 except Exception as e:
-    st.error("API Key not found. Please add GOOGLE_API_KEY to Streamlit Secrets.")
+    st.error("API Key not found. Go to Settings > Secrets and add GOOGLE_API_KEY")
 
 st.set_page_config(page_title="Dev Nimrod | AI Code Auditor", layout="wide")
 
-st.title("🚀 Dev Nimrod")
-st.markdown("### *Agentic Code Auditing & Intelligent Refactoring*")
+# Custom CSS for a professional look
+st.markdown("""
+    <style>
+    .main { background-color: #0e1117; }
+    .stCodeBlock { border: 1px solid #30363d; }
+    </style>
+    """, unsafe_base64=True)
 
-# Sidebar for metrics
-st.sidebar.header("Agent Stats")
-st.sidebar.info("Model: Gemini 3 Flash")
+st.title("🚀 Dev Nimrod")
+st.markdown("#### *Agentic Multi-Agent Code Auditing & Refactoring*")
 
 # Input area
-code_input = st.text_area("Paste code to audit:", height=250, placeholder="Enter Python, C++, or JS code...")
+code_input = st.text_area("Paste your code here (Python, C++, JS, etc.):", height=250)
 
-if st.button("Run Audit & Refactor"):
+if st.button("Run Multi-Agent Audit"):
     if not code_input:
         st.warning("Please provide code first!")
     else:
-        with st.spinner("Nimrod is analyzing..."):
-            # Prompt forces JSON for structured "Why" and "Code"
+        with st.spinner("Agents are analyzing (Security, Performance, Readability)..."):
+            # Multi-Agent System Prompt
             prompt = f"""
-            Refactor this code. Return ONLY a JSON object:
+            Act as a team of three expert agents: 
+            1. Security Specialist 
+            2. Performance Engineer 
+            3. Clean Code Architect.
+            
+            Audit and refactor the following code. 
+            Return ONLY a JSON object with:
             {{
-                "refactored": "string",
-                "reasoning": ["list of strings"],
-                "complexity": "string"
+                "refactored": "the full improved code",
+                "security_audit": "one specific security finding",
+                "performance_audit": "one specific performance finding",
+                "architecture_audit": "one specific clean code finding",
+                "complexity_score": "e.g., O(n^2) -> O(n)"
             }}
             CODE: {code_input}
             """
@@ -42,26 +53,39 @@ if st.button("Run Audit & Refactor"):
             response = model.generate_content(prompt)
             
             try:
-                # Cleaning the AI output to ensure valid JSON
+                # Cleaning the AI output
                 res_text = response.text.replace("```json", "").replace("```", "").strip()
                 data = json.loads(res_text)
                 
-                # Layout for results
-                col1, col2 = st.columns([1, 2])
+                # Layout: Left side for Code, Right side for Agent findings
+                col1, col2 = st.columns([2, 1])
                 
                 with col1:
-                    st.success(f"**Complexity:** {data['complexity']}")
-                    st.write("#### Why Refactor?")
-                    for r in data['reasoning']:
-                        st.write(f"- {r}")
-                
-                with col2:
-                    st.write("#### Refactored Output")
+                    st.write("### 🛠️ Refactored Output")
                     st.code(data['refactored'], language='python')
+                    
+                    # Manual Diff View using standard columns
+                    st.divider()
+                    diff_col1, diff_col2 = st.columns(2)
+                    with diff_col1:
+                        st.caption("Original")
+                        st.code(code_input)
+                    with diff_col2:
+                        st.caption("Refactored")
+                        st.code(data['refactored'])
 
-                st.divider()
-                st.write("#### 🔍 Visual Diff (Old vs New)")
-                diff_viewer(old_text=code_input, new_text=data['refactored'], lang="python")
+                with col2:
+                    st.write("### 🧠 Agent Findings")
+                    st.success(f"**Complexity:** {data['complexity_score']}")
+                    
+                    with st.expander("🛡️ Security Agent", expanded=True):
+                        st.write(data['security_audit'])
+                    
+                    with st.expander("⚡ Performance Agent", expanded=True):
+                        st.write(data['performance_audit'])
+                        
+                    with st.expander("🏗️ Architecture Agent", expanded=True):
+                        st.write(data['architecture_audit'])
                 
-            except:
-                st.error("Failed to parse AI response. Try clicking refactor again.")
+            except Exception as e:
+                st.error(f"Error parsing agent logic. Click Refactor again! Error: {e}")
