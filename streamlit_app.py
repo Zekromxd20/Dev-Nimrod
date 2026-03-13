@@ -16,7 +16,7 @@ else:
     genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
     
     # Using the most stable stable alias for the free tier in 2026
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-3-flash')
 
     # --- UI LAYOUT ---
     code_input = st.text_area("📥 Paste your code here:", height=300, placeholder="int main() { ... }")
