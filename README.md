@@ -34,51 +34,46 @@ As a first-year CSE student, our vision for Dev Nimrod extends beyond simple fil
 - **Unit Test Generation:** Agents will not only refactor code but also generate a `test.py` file to prove the new code works and passes all edge cases.
 - **Self-Healing CI/CD:** If a build fails, Dev Nimrod agents will autonomously analyze the logs and propose a fix.
 
+
 ## 🛠️ Installation & Setup
 
 ### 1. Clone the Repository
 ```bash
 git clone [https://github.com/Zekromxd20/Dev-Nimrod.git](https://github.com/Zekromxd20/Dev-Nimrod.git)
 cd Dev-Nimrod
-`
-
-
+```
 
 ### 2. Install Dependencies
+
 ```bash
 
 pip install -r requirements.txt
-`
-
+```
 
 
 ### 3. Configure Secrets
 Create a .streamlit/secrets.toml file (not tracked by Git) and add your API key:
 
-GOOGLE_API_KEY = "your_actual_api_key_here"
+```In TOML
 
+GOOGLE_API_KEY = "your_actual_api_key_here"
+```
 
 
 
 ### 4. Run Locally
 
+```bash
+
 streamlit run streamlit_app.py
+```
 
 
+---
+
+👥 The Team
 
 
-🛡️ Security
-Dev Nimrod follows "Privacy-by-Design." All API keys are managed via Streamlit Secrets and are never hardcoded or pushed to public version control.
-
-
-
-
-markdown
-## 👥 The Team
-
-| Developer | Role | Branch |
-| :--- | :--- | :--- |
 | **Shubhi Bunkar** | AI Logic & Research | B.Tech CSE (1st Year) |
+
 | **Kartick Thakur** | UI/UX & Integration | B.Tech CSE (1st Year) |
-
-
