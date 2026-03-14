@@ -39,13 +39,13 @@ As a first-year CSE student, our vision for Dev Nimrod extends beyond simple fil
 ### 1. Clone the Repository
 ```bash
 git clone [https://github.com/Zekromxd20/Dev-Nimrod.git](https://github.com/Zekromxd20/Dev-Nimrod.git)
-cd Dev-Nimrod
+cd Dev-Nimrod```
 
 
 ### 2. Install Dependencies
 ```bash
 
-pip install -r requirements.txt
+pip install -r requirements.txt```
 
 
 ### 3. Configure Secrets
