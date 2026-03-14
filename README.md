@@ -40,3 +40,34 @@ As a first-year CSE student, our vision for Dev Nimrod extends beyond simple fil
 ```bash
 git clone [https://github.com/Zekromxd20/Dev-Nimrod.git](https://github.com/Zekromxd20/Dev-Nimrod.git)
 cd Dev-Nimrod
+
+
+### 2. Install Dependencies
+```bash
+
+pip install -r requirements.txt
+
+
+### 3. Configure Secrets
+Create a .streamlit/secrets.toml file (not tracked by Git) and add your API key:
+
+GOOGLE_API_KEY = "your_actual_api_key_here"
+
+
+### 4. Run Locally
+
+streamlit run streamlit_app.py
+
+
+🛡️ Security
+Dev Nimrod follows "Privacy-by-Design." All API keys are managed via Streamlit Secrets and are never hardcoded or pushed to public version control.
+
+
+👩‍💻  Developer 
+
+**• Shubhi Bunkar -** First-Year B.Tech CSE Student
+
+**• Kartick Thakur -** First-Year B.Tech CSE Student
+
+
+
